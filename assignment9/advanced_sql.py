@@ -97,8 +97,10 @@ try:
 
                 # 6. Verify Output
                 print(f"\n--- Verification: Items in Order {new_order_id} ---")
+                
+                # CHANGED: line_items.id -> line_items.line_item_id
                 verify_sql = """
-                    SELECT line_items.id, line_items.quantity, products.product_name 
+                    SELECT line_items.line_item_id, line_items.quantity, products.product_name 
                     FROM line_items 
                     JOIN products ON line_items.product_id = products.product_id 
                     WHERE line_items.order_id = ?
@@ -108,8 +110,19 @@ try:
                 for item in items:
                     print(f"Line Item: {item[0]}, Qty: {item[1]}, Product: {item[2]}")
 
-# missing beofre arghh
 except sqlite3.Error as e:
+    # This will print available columns if there is still an error, helping you debug
     print(f"SQLite Error: {e}")
+    if "no such column" in str(e):
+        print("Existing columns in line_items table:")
+        # Create a new cursor to avoid transaction issues
+        try:
+            temp_cursor = conn.cursor()
+            temp_cursor.execute("PRAGMA table_info(line_items)")
+            columns = [col[1] for col in temp_cursor.fetchall()]
+            print(columns)
+        except:
+            pass
+
 except Exception as e:
     print(f"General Error: {e}")
