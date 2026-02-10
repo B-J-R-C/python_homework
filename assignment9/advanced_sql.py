@@ -80,7 +80,7 @@ try:
                 cursor.execute("SELECT product_id FROM products ORDER BY price ASC LIMIT 5")
                 products = cursor.fetchall()
 
-                # 4. Insert Order (Using 'date' column)
+                # 4. Insert Order
                 cursor.execute("INSERT INTO orders (customer_id, employee_id, date) VALUES (?, ?, DATE('now')) RETURNING order_id", 
                                (customer_id, employee_id))
                 
@@ -97,8 +97,6 @@ try:
 
                 # 6. Verify Output
                 print(f"\n--- Verification: Items in Order {new_order_id} ---")
-                
-                # CHANGED: line_items.id -> line_items.line_item_id
                 verify_sql = """
                     SELECT line_items.line_item_id, line_items.quantity, products.product_name 
                     FROM line_items 
@@ -110,19 +108,26 @@ try:
                 for item in items:
                     print(f"Line Item: {item[0]}, Qty: {item[1]}, Product: {item[2]}")
 
-except sqlite3.Error as e:
-    # This will print available columns if there is still an error, helping you debug
-    print(f"SQLite Error: {e}")
-    if "no such column" in str(e):
-        print("Existing columns in line_items table:")
-        # Create a new cursor to avoid transaction issues
-        try:
-            temp_cursor = conn.cursor()
-            temp_cursor.execute("PRAGMA table_info(line_items)")
-            columns = [col[1] for col in temp_cursor.fetchall()]
-            print(columns)
-        except:
-            pass
+        # --- TASK 4: Aggregation with HAVING ---
+        print("\n--- Task 4: Employees with > 5 Orders ---")
+        sql_query_4 = """
+            SELECT 
+                employees.employee_id, 
+                employees.first_name, 
+                employees.last_name, 
+                COUNT(orders.order_id) as order_count
+            FROM employees
+            JOIN orders ON employees.employee_id = orders.employee_id
+            GROUP BY employees.employee_id
+            HAVING order_count > 5
+            ORDER BY order_count DESC;
+        """
+        cursor.execute(sql_query_4)
+        rows = cursor.fetchall()
+        for row in rows:
+            print(f"Employee: {row[1]} {row[2]} (ID: {row[0]}), Orders: {row[3]}")
 
+except sqlite3.Error as e:
+    print(f"SQLite Error: {e}")
 except Exception as e:
     print(f"General Error: {e}")
