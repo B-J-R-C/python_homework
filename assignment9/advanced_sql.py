@@ -7,6 +7,7 @@ print(f"Connecting to: {os.path.abspath(db_path)}")
 
 try:
     with sqlite3.connect(db_path) as conn:
+        conn.execute("PRAGMA foreign_keys = 1") 
         cursor = conn.cursor()
         
         # --- TASK 1: Total Price per Order ---
@@ -24,14 +25,11 @@ try:
         """
         cursor.execute(sql_query_1)
         rows = cursor.fetchall()
-        
         for row in rows:
             print(f"Order ID: {row[0]}, Total: ${row[1]:.2f}")
 
-        # TASK 2: Average Order Price per Customer
+        # --- TASK 2: Average Order Price per Customer ---
         print("\n--- Task 2: Average Order Price per Customer ---")
-        
-        
         sql_query_2 = """
             SELECT 
                 customers.customer_name, 
@@ -49,30 +47,69 @@ try:
             ON customers.customer_id = subquery.customer_id
             GROUP BY customers.customer_id;
         """
-        
         cursor.execute(sql_query_2)
         rows = cursor.fetchall()
-        
-        if not rows:
-            print("No data returned for Task 2.")
-        
         for row in rows:
-            # Debug raw data if names missing
-            # print(f"DEBUG: {row}") 
-            
             name = row[0]
             avg_price = row[1]
-            
-            if name is None:
-                name = "Unknown Customer"
-            
-            if avg_price is None:
-                print(f"Customer: {name}, Avg Order Price: $0.00")
-            else:
+            if name and avg_price:
                 print(f"Customer: {name}, Avg Order Price: ${avg_price:.2f}")
 
+        # --- TASK 3: Insert Transaction ---
+        print("\n--- Task 3: Insert Transaction (New Order) ---")
+
+        # 1. Get Customer ID
+        cursor.execute("SELECT customer_id FROM customers WHERE customer_name = 'Perez and Sons'")
+        cust_res = cursor.fetchone()
+        
+        if not cust_res:
+            print("Error: Customer 'Perez and Sons' not found.")
+        else:
+            customer_id = cust_res[0]
+
+            # 2. Get Employee ID
+            cursor.execute("SELECT employee_id FROM employees WHERE first_name = 'Miranda' AND last_name = 'Harris'")
+            emp_res = cursor.fetchone()
+            
+            if not emp_res:
+                print("Error: Employee 'Miranda Harris' not found.")
+            else:
+                employee_id = emp_res[0]
+
+                # 3. Get 5 Cheapest Products
+                cursor.execute("SELECT product_id FROM products ORDER BY price ASC LIMIT 5")
+                products = cursor.fetchall()
+
+                # 4. Insert Order (Using 'date' column)
+                cursor.execute("INSERT INTO orders (customer_id, employee_id, date) VALUES (?, ?, DATE('now')) RETURNING order_id", 
+                               (customer_id, employee_id))
+                
+                new_order_id = cursor.fetchone()[0]
+                print(f"Created New Order ID: {new_order_id}")
+
+                # 5. Insert Line Items
+                for prod in products:
+                    product_id = prod[0]
+                    cursor.execute("INSERT INTO line_items (order_id, product_id, quantity) VALUES (?, ?, 10)", 
+                                   (new_order_id, product_id))
+                
+                print("Inserted 5 line items.")
+
+                # 6. Verify Output
+                print(f"\n--- Verification: Items in Order {new_order_id} ---")
+                verify_sql = """
+                    SELECT line_items.id, line_items.quantity, products.product_name 
+                    FROM line_items 
+                    JOIN products ON line_items.product_id = products.product_id 
+                    WHERE line_items.order_id = ?
+                """
+                cursor.execute(verify_sql, (new_order_id,))
+                items = cursor.fetchall()
+                for item in items:
+                    print(f"Line Item: {item[0]}, Qty: {item[1]}, Product: {item[2]}")
+
+# missing beofre arghh
 except sqlite3.Error as e:
     print(f"SQLite Error: {e}")
 except Exception as e:
     print(f"General Error: {e}")
-
