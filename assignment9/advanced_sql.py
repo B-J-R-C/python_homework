@@ -2,7 +2,6 @@ import sqlite3
 import os
 
 # Define the path to the database
-# We are in 'assignment9', so we go up one level (..) to find 'db'
 db_path = '../db/lesson.db'
 
 try:
@@ -11,7 +10,6 @@ try:
         cursor = conn.cursor()
         
         # 2. Define the SQL Query
-        # We perform a 3-way join to link Orders -> Line Items -> Products
         sql_query = """
             SELECT 
                 orders.order_id, 
