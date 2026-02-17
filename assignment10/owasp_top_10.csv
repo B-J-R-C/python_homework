@@ -1,0 +1,11 @@
+Vulnerability Title,Link
+A01 Broken Access Control,https://owasp.org/Top10/2025/A01_2025-Broken_Access_Control/
+A02 Security Misconfiguration,https://owasp.org/Top10/2025/A02_2025-Security_Misconfiguration/
+A04 Cryptographic Failures,https://owasp.org/Top10/2025/A04_2025-Cryptographic_Failures/
+A05 Injection,https://owasp.org/Top10/2025/A05_2025-Injection/
+A06 Insecure Design,https://owasp.org/Top10/2025/A06_2025-Insecure_Design/
+A01:2025 - Broken Access Control,https://owasp.org/Top10/2025/A01_2025-Broken_Access_Control/
+A02:2025 - Security Misconfiguration,https://owasp.org/Top10/2025/A02_2025-Security_Misconfiguration/
+A04:2025 - Cryptographic Failures,https://owasp.org/Top10/2025/A04_2025-Cryptographic_Failures/
+A05:2025 - Injection,https://owasp.org/Top10/2025/A05_2025-Injection/
+A06:2025 - Insecure Design,https://owasp.org/Top10/2025/A06_2025-Insecure_Design/
