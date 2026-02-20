@@ -1,0 +1,21 @@
+--- Wikipedia Robots.txt Analysis ---
+
+1. Which sections are restricted for crawling?
+Aadministrative, dynamic, and non-article pages to prevent server overload and data redundancy. 
+Common restricted paths include:
+- /wiki/Special: (Special pages like random article, recent changes, user login)
+- /wiki/Talk: (Discussion pages)
+- /w/ (The internal script path used for editing, history, and API calls)
+- /api/ (Direct API access, which should be done via specific API protocols, not scraping)
+- /trap/ (Honeytraps for bad bots)
+
+2. Are there specific rules for certain user agents?
+Yes. The file contains a "User-agent: *" section which applies to all bots. 
+However, it also frequently lists specific bots (like "Orthogaffe" or "MJ12bot") to explicitly block them or set specific "Crawl-delay" setting for bots that have previously caused issues. 
+It also often has specific allowances for "Googlebot" or other major search engines to ensure articles are indexed while at the same time keeping administrative pages hidden.
+
+--- Reflection on Ethical Scraping ---
+
+3. Purpose and Ethics:
+The robots.txt file serves as a "Code of Conduct" for web crawlers, signaling which parts of a site are public territory and which are not. Its main purpose is to prevent bots from overloading the server with requests (DDoS-like behavior) and to stop them from indexing private, duplicate, or irrelevant data (like search result pages). 
+Respecting robots.txt is the first rule of ethical scraping because it demonstrates that the scraper respects the website owner's resources and boundaries.
