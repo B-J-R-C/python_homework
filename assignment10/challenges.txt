@@ -1,0 +1,4 @@
+Challenge: Identifying correct XPath.
+Resolution: I inspected the page source and noticed that all the Top 10 items started with "A0" or "A10". I used the contains() function in XPath to filter for these links within the main section, wand that helped exclude the sidebar and footer links.
+Challenge: Finding the correct page and elements.
+Resolution: The initial script pointed to the OWASP landing page, which didn't list the vulnerabilities directly. I updated the URL to 'https://owasp.org/Top10/'. Additionally, the XPath text matching was too strict,
